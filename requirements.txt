@@ -1,0 +1,1 @@
+INSERT INTO `hotel_management`.`hotel` (`cusID`, `firstName`, `lastName`, `address`, `dob`, `mobile`, `national`, `gender`, `dateIn`, `dateOut`, `roomN`, `totalCost`) VALUES ('1', 'a', 'v', 'd', 'd', 'd', 'd', 'd', 'd', 'd', 'd', 'd');

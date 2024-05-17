@@ -226,10 +226,9 @@ class Hotel:
         def totalCostAndAddData():
             valueTotalCost()
             roomNumber()
-            print(national.get())
-            if (mobile.get() == "" or service.get() == ""):
+            if (mobile.get() == "" or service.get() == "" or typeOfRoom.get() == "" or numberFloor.get() == "" or roomOrder.get() == ""):
                 tkinter.messagebox.showerror("Provide number phone,  and service")
-            else:
+            try:
                 sqlCon = mysql.connector.connect(host="localhost", user="root", password="Phuc1012004@", database="hotel_management")
                 cur = sqlCon.cursor()
                 sql = "INSERT INTO hotel2 (cusID, firstName, lastName, address, dob, mobile, email, national, gender, dateIn, dateOut,typeOfId, typeOfRoom, roomOrder, numberFloor, service, roomN, totalDays, paidTax, subTotal, totalCost) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
@@ -255,26 +254,39 @@ class Hotel:
                     paidTax.get(),
                     subTotal.get(),
                     totalCost.get()
-                )
+                )    
                 cur.execute(sql, data)
                 sqlCon.commit()
-                sqlCon.close()
                 tkinter.messagebox.showinfo("Data Entry Form", "Record Enter Successfully")
-        
+            except mysql.connector.Error as err:
+                tk.messagebox.showerror("Database Error", f"An error occurred: {err}")
+            finally:
+                if sqlCon.is_connected():
+                    cur.close()
+                    sqlCon.close()
         # Display    
         def displayData():
-            sqlCon = mysql.connector.connect(host="localhost", user="root", password="Phuc1012004@", database="hotel_management")
-            cur = sqlCon.cursor()
-            cur.execute("select cusID, firstName, lastName, address, dob, mobile, national, gender, dateIn, dateOut, roomN, totalCost from hotel_management.hotel2")
-            result = cur.fetchall()
-            if len(result) != 0:
-                self.manageHotel.delete(*self.manageHotel.get_children())
-                for row in result:
-                    self.manageHotel.insert('',END, values=row)
-            sqlCon.commit()
-            sqlCon.close()
+            try:
+                sqlCon = mysql.connector.connect(host="localhost", user="root", password="Phuc1012004@", database="hotel_management")
+                cur = sqlCon.cursor()
+                cur.execute("select cusID, firstName, lastName, address, dob, mobile, national, gender, dateIn, dateOut, roomN, totalCost from hotel_management.hotel2")
+                result = cur.fetchall() # lấy hết kết quả hàng từ truy vấn
+                if len(result) != 0:
+                    # xóa tất cả các hàng hiện có trong treeview
+                    self.manageHotel.delete(*self.manageHotel.get_children())
+                    
+                    # chèn lại tất cả dữ liệu đã truy vấn vào trên treeview
+                    for row in result:
+                        self.manageHotel.insert('',END, values=row)
+                sqlCon.commit()
+            except mysql.connector.Error as err:
+                tk.messagebox.showerror("Database Error", f"An error occurred: {err}")
+            finally:
+                if sqlCon.is_connected():
+                    cur.close()
+                    sqlCon.close()
         
-        #
+        # click one Data 
         def on_treeview_select(event):
             selected_item = self.manageHotel.selection()[0]
             cus_id = self.manageHotel.item(selected_item, 'values')[0]
@@ -283,78 +295,96 @@ class Hotel:
         
         # viewOne  
         def viewOne(cus_id):
-            sqlCon = mysql.connector.connect(
+            try:
+                sqlCon = mysql.connector.connect(
                 host="localhost",
                 user="root",
                 password="Phuc1012004@",
                 database="hotel_management"
-            )
-            cur = sqlCon.cursor()
-            cur.execute("SELECT * FROM hotel_management.hotel2 WHERE cusID = %s", (cus_id,))
-            row = cur.fetchone()
-            
-            if row:
-                cusID.set(row[0]),
-                firstName.set(row[1]),
-                lastName.set(row[2]),
-                address.set(row[3]),
-                dob.set(row[4]),
-                mobile.set(row[5]),
-                email.set(row[6]), #
-                national.set(row[7]),
-                gender.set(row[8]),
-                dateIn.set(row[9]),
-                dateOut.set(row[10]),
-                typeOfId.set(row[11]), #
-                typeOfRoom.set(row[12]), #
-                roomOrder.set(row[13]), #
-                numberFloor.set(row[14]), # 
-                service.set(row[15]), #  
-                roomN.set(row[16]),
-                totalDays.set(row[17]),
-                paidTax.set(row[18]),
-                subTotal.set(row[19]),
-                totalCost.set(row[20])
+                )
+                cur = sqlCon.cursor()
+                cur.execute("SELECT * FROM hotel_management.hotel2 WHERE cusID = %s", (cus_id,))
+                row = cur.fetchone()
+                
+                if row:
+                    cusID.set(row[0]),
+                    firstName.set(row[1]),
+                    lastName.set(row[2]),
+                    address.set(row[3]),
+                    dob.set(row[4]),
+                    mobile.set(row[5]),
+                    email.set(row[6]), #
+                    national.set(row[7]),
+                    gender.set(row[8]),
+                    dateIn.set(row[9]),
+                    dateOut.set(row[10]),
+                    typeOfId.set(row[11]), #
+                    typeOfRoom.set(row[12]), #
+                    roomOrder.set(row[13]), #
+                    numberFloor.set(row[14]), # 
+                    service.set(row[15]), #  
+                    roomN.set(row[16]),
+                    totalDays.set(row[17]),
+                    paidTax.set(row[18]),
+                    subTotal.set(row[19]),
+                    totalCost.set(row[20])
+            except mysql.connector.Error as err:
+                tk.messagebox.showerror("Database Error", f"An error occurred: {err}")
+            finally:
+                if sqlCon.is_connected():
+                    cur.close()
+                    sqlCon.close()
             
         #Update
         def update():
             valueTotalCost()
             roomNumber()
-            sqlCon = mysql.connector.connect(host="localhost", user="root", password="Phuc1012004@", database="hotel_management")
-            cur = sqlCon.cursor()
-            cur.execute("update hotel_management.hotel2 set firstname=%s, lastname=%s, address=%s, dob=%s, mobile=%s, national=%s, gender=%s, dateIn=%s, dateOut=%s,typeOfId=%s, typeOfRoom=%s, roomOrder=%s,numberFloor=%s, service=%s, totalCost=%s where cusID=%s", (
-                firstName.get(),
-                lastName.get(),
-                address.get(),
-                dob.get(),
-                mobile.get(),
-                national.get(),
-                gender.get(),
-                dateIn.get(),
-                dateOut.get(),
-                typeOfId.get(),
-                typeOfRoom.get(),
-                roomOrder.get(),
-                numberFloor.get(),
-                service.get(),
-                totalCost.get(),
-                cusID.get(),
-            ))
-            sqlCon.commit()
-            sqlCon.close()
-            tkinter.messagebox.showinfo("Data Entry Form", "Record successfully updated")
+            try:
+                sqlCon = mysql.connector.connect(host="localhost", user="root", password="Phuc1012004@", database="hotel_management")
+                cur = sqlCon.cursor()
+                cur.execute("update hotel_management.hotel2 set firstname=%s, lastname=%s, address=%s, dob=%s, mobile=%s, national=%s, gender=%s, dateIn=%s, dateOut=%s,typeOfId=%s, typeOfRoom=%s, roomOrder=%s,numberFloor=%s, service=%s, totalCost=%s where cusID=%s", (
+                    firstName.get(),
+                    lastName.get(),
+                    address.get(),
+                    dob.get(),
+                    mobile.get(),
+                    national.get(),
+                    gender.get(),
+                    dateIn.get(),
+                    dateOut.get(),
+                    typeOfId.get(),
+                    typeOfRoom.get(),
+                    roomOrder.get(),
+                    numberFloor.get(),
+                    service.get(),
+                    totalCost.get(),
+                    cusID.get(),
+                ))
+                sqlCon.commit()
+                tkinter.messagebox.showinfo("Data Entry Form", "Record successfully updated")
+            
+            except mysql.connector.Error as err:
+                tk.messagebox.showerror("Database Error", f"An error occurred: {err}")
+            finally:
+                if sqlCon.is_connected():
+                    cur.close()
+                    sqlCon.close()
+            displayData()
 
         #delete
         def delete():
-            # valueTotalCost()
-            # roomNumber()
-            sqlCon = mysql.connector.connect(host="localhost", user="root", password="Phuc1012004@", database="hotel_management")
-            cur = sqlCon.cursor()
-            cur.execute("DELETE FROM hotel_management.hotel2 WHERE cusID=%s", (cusID.get(),))
-
-            sqlCon.commit()
-            sqlCon.close()
-            tkinter.messagebox.showinfo("Data Entry Form", "Record successfully delete")
+            try:
+                sqlCon = mysql.connector.connect(host="localhost", user="root", password="Phuc1012004@", database="hotel_management")
+                cur = sqlCon.cursor()
+                cur.execute("DELETE FROM hotel_management.hotel2 WHERE cusID=%s", (cusID.get(),))
+                sqlCon.commit()
+                tkinter.messagebox.showinfo("Data Entry Form", "Record successfully delete")
+            except mysql.connector.Error as err:
+                tk.messagebox.showerror("Database Error", f"An error occurred: {err}")
+            finally:
+                if sqlCon.is_connected():
+                    cur.close()
+                    sqlCon.close()
             displayData()
             Reset()
         
@@ -401,6 +431,7 @@ class Hotel:
             # sqlCon.close()
             finally:
                 if sqlCon is not None and sqlCon.is_connected():
+                    cur.close()
                     sqlCon.close()
         
         #===========================Widget=================
@@ -455,7 +486,10 @@ class Hotel:
         #Gender 
         self.lblGender = Label(LeftFrame, font=('arial', 14, 'bold'), text="Gender:", padx=1)
         self.lblGender.grid(row=16, column=0, sticky=W)
-        self.txtGender = Entry(LeftFrame, font=('arial', 14, 'bold'), width=18, textvariable=gender)
+        # self.txtGender = Entry(LeftFrame, font=('arial', 14, 'bold'), width=18, textvariable=gender)
+        self.txtGender = ttk.Combobox(LeftFrame, state='readonly', font=('arial', 14, 'bold'), width=17, textvariable=gender)
+        self.txtGender ['value'] = (' ', 'Male', 'Female', 'Other')
+        self.txtGender.current(0)
         self.txtGender.grid(row=16, column=1, pady=3, padx=40)
         
         #Date In
@@ -514,8 +548,6 @@ class Hotel:
 
         
         #====================================================widgets================================================
-        # self.lblLabel = Label(RightFrame1, font=('arial', 11, 'bold'), padx=6, pady=10, text="CustomerRef   Firstname\t  Lastname\tAddress \t  Gender\t   Mobile\t     DateIn\t     Dateout \t    Email")
-        # self.lblLabel.grid(row=0, column=0, columnspan=17) #columnspan trải dài cột theo chiều ngang
         
         scrollbar = Scrollbar(RightFrame2, orient=VERTICAL) #vertical cuộn theo hướng dọc 
         self.manageHotel = ttk.Treeview(RightFrame2, height=22, columns=("cusID", "firstName", "lastName", "address", "dob", "mobile", "national", "gender", "dateIn", "dateOut","roomN", "totalCost"), yscrollcommand=scrollbar.set)

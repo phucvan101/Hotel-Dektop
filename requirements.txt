@@ -1,1 +1,14 @@
 INSERT INTO `hotel_management`.`hotel` (`cusID`, `firstName`, `lastName`, `address`, `dob`, `mobile`, `national`, `gender`, `dateIn`, `dateOut`, `roomN`, `totalCost`) VALUES ('1', 'a', 'v', 'd', 'd', 'd', 'd', 'd', 'd', 'd', 'd', 'd');
+
+echo "# vd" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/phucvan101/vd.git
+git push -u origin main
+
+
+git remote add origin https://github.com/phucvan101/vd.git
+git branch -M main
+git push -u origin main

@@ -1,35 +1,43 @@
 import tkinter as tk
-import mysql.connector 
 from tkinter import messagebox
 from tkinter import *
 import pymysql
+
 
 def forgetPassword():
     login.destroy()
     import forgetPassword
 
-def signUpPage():
-    login.destroy()
-    import signUp
-    
+
 def loginUser():
     if user.get() == '' or password.get() == '':
         messagebox.showerror('Error', 'All Fields Are Required')
     else:
         try:
-            con = pymysql.connect(host='localhost', user='root', password='Phuc1012004@')
+            con = pymysql.connect(host='localhost', user='root', password='Phuc1012004@', database='userdata')
             cur = con.cursor()
-            query = 'USE userdata'
-            cur.execute(query)
-            query = 'SELECT * FROM data WHERE username=%s AND password=%s'
-            cur.execute(query, (user.get(), password.get()))
-            row = cur.fetchone()
-            
-            if row is None:
-                messagebox.showerror('Error', 'Invalid username or password')
-            else:
-                import main
-                main.Hotel() 
+            if user.get() == 'admin' and password.get() == 'admin123456':
+                dbName = 'admin'
+                query = f'SELECT * FROM {dbName} WHERE userName=%s AND password=%s'
+                cur.execute(query, (user.get(), password.get()))
+                row = cur.fetchone()
+                
+                if row is None:
+                    messagebox.showerror('Error', 'Invalid username or password')
+                else:
+                    login.destroy()
+                    import choseManagement
+            else: 
+                dbName = 'employee'
+                query = f'SELECT * FROM {dbName} WHERE userName=%s AND password=%s'
+                cur.execute(query, (user.get(), password.get()))
+                row = cur.fetchone()
+                
+                if row is None:
+                    messagebox.showerror('Error', 'Invalid username or password')
+                else:
+                    login.destroy()
+                    import main
         except pymysql.MySQLError as e:
             messagebox.showerror('Error', f'Error executing query: {e}')
         finally:
@@ -84,32 +92,57 @@ def show():
     password.config(show="")
     eyeButton.config(command=hide)
 
-password = Entry(frame, width=25, fg='black', border=0, bg='white', font=('Microsoft YaHei UI Light', 12))
+password = Entry(
+    frame, 
+    width=25, 
+    fg='black', 
+    border=0, 
+    bg='white', 
+    font=('Microsoft YaHei UI Light', 12)
+)
 password.place(x=30, y=150)
 password.insert(0, 'Password')
 password.bind('<FocusIn>', on_enter_password)
 password.bind('<FocusOut>', on_leave_password)
 
 openEye = PhotoImage(file='oE.png')
-eyeButton = Button(frame, image=openEye, bd=0, bg='white', activebackground='white', cursor='hand2', command=hide)
-eyeButton.place(x= 290, y = 150)
+eyeButton = Button(
+    frame, 
+    image=openEye, 
+    bd=0,
+    bg='white', 
+    activebackground='white',
+    cursor='hand2', 
+    command=hide
+).place(x= 290, y = 150)
 
 Frame(frame, width=295, height=2, bg='black').place(x=25, y=177)
 
 # Forget password
-forgetButton = Button(frame, text='Forget Password?', bd=0, bg='white', activebackground='white', cursor='hand2', font=('Microsoft YaHei UI Light', 10), command=forgetPassword)
+forgetButton = Button(
+    frame, 
+    text='Forget Password?', 
+    bd=0, bg='white', 
+    activebackground='white', 
+    cursor='hand2', 
+    font=('Microsoft YaHei UI Light', 10), command=forgetPassword
+)
 forgetButton.place(x= 215, y = 183)
 
 
 
 ########################################################################
 
-btSignIn = Button(frame, width=39, pady=7, text='Sign in', bg='#57a1f8', fg='white', border=0, command=loginUser).place(x=35, y=230)
+btSignIn = Button(
+    frame, 
+    width=39, 
+    pady=7, 
+    text='Sign in',
+    bg='#57a1f8',
+    fg='white',
+    border=0,
+    command=loginUser
+).place(x=35, y=230)
 
-labelQuestion = Label(frame, text="Don't have an account?", fg='black', bg='white', font=('Microsoft YaHei UI Light', 9))
-labelQuestion.place(x=75, y=290)
-
-sign_up = Button(frame, width=6, text='Sign up', border=0, bg='white',font=('Microsoft YaHei UI Light', 9, 'bold underline'), cursor='hand2', fg='#57a1f8', activebackground='white', activeforeground='#57a1f8', command=signUpPage) #curson thay đổi con trỏ chuột
-sign_up.place(x=215, y=290)
 
 login.mainloop()

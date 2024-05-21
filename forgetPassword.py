@@ -15,14 +15,14 @@ def changePassword():
         try:
             con = pymysql.connect(host='localhost', user='root', password='Phuc1012004@', database='userdata')
             cur = con.cursor()
-            query = 'SELECT * FROM data WHERE username=%s'
+            query = 'SELECT * FROM employee WHERE username=%s'
             cur.execute(query, (user.get()))
             row = cur.fetchone()
             
             if row is None:
                 messagebox.showerror('Error', 'Incorrect Username')
             else:
-                query = 'UPDATE data set password=%s WHERE username=%s'
+                query = 'UPDATE employee set password=%s WHERE userName=%s'
                 cur.execute(query, (nPassword.get(), user.get()))
                 con.commit()
                 messagebox.showinfo('Success', 'Password is reset, please login with new password')
